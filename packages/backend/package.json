@@ -1,0 +1,13 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "express": "^4.21.1",
+    "ethers": "^6.13.4",
+    "dotenv": "^16.4.5"
+  },
+  "scripts": {
+    "start": "node src/index.js"
+  }
+} 
