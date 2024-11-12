@@ -5,6 +5,9 @@
   "workspaces": ["packages/*"],
   "scripts": {
     "build": "pnpm -r run build",
-    "deploy-contracts": "pnpm --filter contracts run deploy"
+    "deploy-contracts": "pnpm --filter contracts run deploy",
+    "deploy-contracts:sepolia": "pnpm --filter contracts run deploy:sepolia",
+    "test": "pnpm -r run test",
+    "test:contracts": "pnpm --filter contracts run test"
   }
 }

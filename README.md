@@ -27,34 +27,50 @@ iLoveCertLab/
 - Node.js 16.x 이상
 - pnpm 7.x 이상
 - MetaMask 또는 기타 Web3 지갑
+- Sepolia 테스트넷 ETH (테스트넷 배포 시)
 
 ### 설치
 
 1. 저장소 클론
-```
+```bash
 git clone https://github.com/yourusername/iLoveCertLab.git
 cd iLoveCertLab
 ```
 
 2. 의존성 설치
-```
+```bash
 pnpm install
+```
+
+3. 환경 변수 설정
+각 패키지의 .env 파일을 설정합니다.
+
+contracts/.env:
+```plaintext
+PRIVATE_KEY=your_private_key_here
+SEPOLIA_URL=your_sepolia_rpc_url_here
 ```
 
 ### 개발 환경 실행
 
 1. 스마트 컨트랙트 배포
-```
+로컬 네트워크에 배포:
+```bash
 pnpm deploy-contracts
 ```
 
-2. 프론트엔드 실행
+테스트넷(Sepolia)에 배포:
+```bash
+pnpm deploy-contracts:sepolia
 ```
+
+2. 프론트엔드 실행
+```bash
 pnpm --filter frontend run start
 ```
 
 3. 백엔드 서버 실행
-```
+```bash
 pnpm --filter backend run start
 ```
 
@@ -83,9 +99,12 @@ REACT_APP_CONTRACT_ADDRESS=deployed_contract_address
 
 ## 테스트
 
-```
-# 스마트 컨트랙트 테스트
-pnpm --filter contracts run test
+```bash
+# 모든 패키지 테스트 실행
+pnpm test
+
+# 스마트 컨트랙트만 테스트
+pnpm test:contracts
 
 # 프론트엔드 테스트
 pnpm --filter frontend run test
@@ -94,12 +113,18 @@ pnpm --filter frontend run test
 ## 배포
 
 1. 스마트 컨트랙트 배포
-```
+로컬 네트워크에 배포:
+```bash
 pnpm deploy-contracts
 ```
 
-2. 프론트엔드 빌드
+Sepolia 테스트넷에 배포:
+```bash
+pnpm deploy-contracts:sepolia
 ```
+
+2. 프론트엔드 빌드
+```bash
 pnpm --filter frontend run build
 ```
 
