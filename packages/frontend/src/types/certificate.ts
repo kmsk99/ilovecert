@@ -1,11 +1,11 @@
 export interface Certificate {
-  id: bigint;
-  ipfsHash: string;
+  id: string;
+  name: string;
+  description?: string;
   recipient: string;
-  issuedAt: bigint;
-  isValid: boolean;
-  certificateType: string;
-  issuerName: string;
+  issuer: string;
+  issuedAt: number;
+  imageUrl?: string;
 }
 
 export interface CertificateFormData {

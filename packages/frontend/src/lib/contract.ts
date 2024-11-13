@@ -1,3 +1,5 @@
+import { Certificate } from '@/types/certificate';
+
 export const certificateABI = [
   {
     inputs: [
@@ -112,3 +114,40 @@ export const certificateABI = [
     type: 'function',
   },
 ] as const;
+
+export async function getCertificate(
+  certificateId: string
+): Promise<Certificate> {
+  // TODO: 실제 컨트랙트 호출 로직 구현
+  // 임시 더미 데이터 반환
+  return {
+    id: certificateId,
+    name: '샘플 인증서',
+    description: '이것은 샘플 인증서입니다.',
+    recipient: '0x1234...5678',
+    issuer: '0x8765...4321',
+    issuedAt: Date.now(),
+    imageUrl: '/sample-certificate.png',
+  };
+}
+
+export async function getCertificates(address: string): Promise<Certificate[]> {
+  // TODO: 실제 컨트랙트 호출 로직 구현
+  // 임시 더미 데이터 반환
+  return [
+    {
+      id: '1',
+      name: '샘플 인증서 1',
+      recipient: address,
+      issuer: '0x8765...4321',
+      issuedAt: Date.now() - 86400000,
+    },
+    {
+      id: '2',
+      name: '샘플 인증서 2',
+      recipient: address,
+      issuer: '0x8765...4321',
+      issuedAt: Date.now(),
+    },
+  ];
+}
