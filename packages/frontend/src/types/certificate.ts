@@ -7,3 +7,13 @@ export interface Certificate {
   certificateType: string;
   issuerName: string;
 }
+
+export interface CertificateFormData {
+  recipientName: string;
+  certificateType: string;
+  description: string;
+  issuerName: string;
+  bgColor: string;
+  borderColor: string;
+  logoBase64: string;
+}

@@ -1,9 +1,7 @@
 'use client';
 
-
-
-import { CertificateList } from '../components/certificate/certificate-list';
-import { ConnectButton } from '../components/connect-button';
+import { CertificateForm } from '@/components/certificate/certificate-form';
+import { ConnectButton } from '@/components/connect-button';
 
 export default function Home() {
   return (
@@ -13,7 +11,13 @@ export default function Home() {
           <h1 className="text-4xl font-bold">iLoveCert</h1>
           <ConnectButton />
         </div>
-        <CertificateList />
+        <CertificateForm />
+        {/* TODO: 
+          1. 지갑 연결 상태에 따라 폼 표시/숨김 처리
+          2. 발급된 인증서 목록 표시
+          3. IPFS 연동
+          4. 로딩 상태 표시
+        */}
       </div>
     </main>
   );
