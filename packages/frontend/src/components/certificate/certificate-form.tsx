@@ -9,16 +9,27 @@ import { ColorField } from './form-fields/ColorField';
 import { ImageUploadField } from './form-fields/ImageUploadField';
 import { TextField } from './form-fields/TextField';
 
+const defaultFormData: CertificateFormData = {
+  recipientName: '',
+  certificateType: '상장',
+  description: `위 사람은 2024년도 전국체육대회 수영 종목에서 
+우수한 성적을 거두어 체육 발전에 기여하였기에 
+이 상장을 수여합니다.`,
+  issuerName: '김체육',
+  issuerTitle: '회장',
+  organizationName: '대한체육회',
+  bgColor: '#ffffff',
+  borderColor: '#000000',
+  logoBase64: '',
+  issuedAt: new Date().toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+};
+
 export function CertificateForm() {
-  const [formData, setFormData] = useState<CertificateFormData>({
-    recipientName: '',
-    certificateType: '',
-    description: '',
-    issuerName: '',
-    bgColor: '#ffffff',
-    borderColor: '#000000',
-    logoBase64: '',
-  });
+  const [formData, setFormData] = useState<CertificateFormData>(defaultFormData);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -53,6 +64,7 @@ export function CertificateForm() {
             value={formData.recipientName}
             onChange={handleChange}
             required
+            placeholder="수상자 이름을 입력하세요"
           />
           <TextField
             label="인증서 종류"
@@ -63,7 +75,7 @@ export function CertificateForm() {
           />
           <div>
             <label className="block text-sm font-medium text-gray-700">
-            설명
+              설명
             </label>
             <textarea
               name="description"
@@ -74,11 +86,24 @@ export function CertificateForm() {
             />
           </div>
           <TextField
+            label="발급 기관"
+            name="organizationName"
+            value={formData.organizationName}
+            onChange={handleChange}
+            required
+          />
+          <TextField
             label="발급자 이름"
             name="issuerName"
             value={formData.issuerName}
             onChange={handleChange}
             required
+          />
+          <TextField
+            label="발급자 직위"
+            name="issuerTitle"
+            value={formData.issuerTitle}
+            onChange={handleChange}
           />
           <ColorField
             label="배경 색상"
@@ -107,7 +132,7 @@ export function CertificateForm() {
       </div>
       <div className="border rounded-lg p-4">
         <h2 className="text-2xl font-bold mb-6">미리보기</h2>
-        <CertificatePreview {...formData} issuedAt={new Date().toLocaleDateString('ko-KR')} />
+        <CertificatePreview {...formData} />
       </div>
     </div>
   );

@@ -5,22 +5,17 @@ import jsPDF from 'jspdf';
 import Image from 'next/image';
 import { useRef } from 'react';
 
-interface CertificatePreviewProps {
-  recipientName: string;
-  certificateType: string;
-  description: string;
-  issuerName: string;
-  issuedAt: string;
-  logoBase64?: string;
-  bgColor?: string;
-  borderColor?: string;
-}
+import { CertificateFormData } from '@/types/certificate';
+
+interface CertificatePreviewProps extends CertificateFormData {}
 
 export function CertificatePreview({
   recipientName,
   certificateType,
   description,
   issuerName,
+  issuerTitle,
+  organizationName,
   issuedAt,
   logoBase64,
   bgColor = 'white',
@@ -77,25 +72,27 @@ export function CertificatePreview({
         )}
 
         <div className="text-center flex-1 flex flex-col justify-center space-y-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-8">
             {certificateType}
           </h1>
           
           <div className="text-xl">
-            This is to certify that
             <div className="font-bold text-2xl my-4">{recipientName}</div>
-            has successfully completed
           </div>
           
-          <p className="text-lg whitespace-pre-wrap max-w-md mx-auto">
+          <p className="text-lg whitespace-pre-wrap max-w-md mx-auto leading-relaxed">
             {description}
           </p>
         </div>
         
         <div className="mt-12 pt-8 border-t border-gray-300">
-          <div className="text-right space-y-2">
-            <div className="text-sm text-gray-600">Date: {issuedAt}</div>
-            <div className="font-bold">{issuerName}</div>
+          <div className="text-center space-y-4">
+            <div className="text-lg">{issuedAt}</div>
+            <div className="text-xl font-bold">{organizationName}</div>
+            <div className="flex justify-center items-center gap-2">
+              <span className="text-lg">{issuerTitle}</span>
+              <span className="text-xl font-bold">{issuerName}</span>
+            </div>
           </div>
         </div>
       </div>

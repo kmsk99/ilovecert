@@ -13,6 +13,9 @@ export interface CertificateFormData {
   certificateType: string;
   description: string;
   issuerName: string;
+  issuerTitle: string;
+  issuedAt: string;
+  organizationName: string;
   bgColor: string;
   borderColor: string;
   logoBase64: string;
