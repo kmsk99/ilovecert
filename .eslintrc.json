@@ -1,0 +1,55 @@
+{
+  "root": true,
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:import/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": ["import", "@typescript-eslint"],
+  "parser": "@typescript-eslint/parser",
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    },
+    "import/resolver": {
+      "typescript": {
+        "project": ["packages/*/tsconfig.json"],
+        "alwaysTryTypes": true
+      },
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"],
+        "project": ["packages/*/tsconfig.json"]
+      }
+    },
+    "react": {
+      "version": "18.2.0"
+    }
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "no-undef": "off",
+    "dot-notation": "error",
+    "import/no-unresolved": "error",
+    "import/named": "off",
+    "import/default": "warn",
+    "import/namespace": "warn",
+    "import/export": "warn",
+    "prettier/prettier": "warn",
+    "import/no-named-as-default-member": "warn",
+    "react/jsx-sort-props": [
+      "warn",
+      {
+        "callbacksLast": true,
+        "shorthandFirst": true,
+        "ignoreCase": true,
+        "reservedFirst": true
+      }
+    ]
+  }
+} 

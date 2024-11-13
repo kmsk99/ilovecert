@@ -8,25 +8,23 @@ interface ColorFieldProps {
 export function ColorField({ label, name, value, onChange }: ColorFieldProps) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <div className="flex gap-2">
+      <label className='block text-sm font-medium text-gray-700'>{label}</label>
+      <div className='flex gap-2'>
         <input
-          type="color"
+          className='mt-1'
           name={name}
+          type='color'
           value={value}
           onChange={onChange}
-          className="mt-1"
         />
         <input
-          type="text"
+          className='mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
+          name={name}
+          type='text'
           value={value}
           onChange={onChange}
-          name={name}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
         />
       </div>
     </div>
   );
-} 
+}

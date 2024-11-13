@@ -19,7 +19,7 @@ const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
 const contract = new ethers.Contract(
   process.env.CONTRACT_ADDRESS!,
   certificateABI,
-  provider
+  provider,
 );
 
 // 인증서 조회 API
@@ -43,7 +43,7 @@ app.get('/api/certificates/:address', async (req, res) => {
         isValid: cert.isValid,
         certificateType: cert.certificateType,
         issuerName: cert.issuerName,
-      })
+      }),
     );
 
     res.json(formattedCertificates);

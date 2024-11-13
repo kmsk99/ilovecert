@@ -8,7 +8,11 @@ interface ImageUploadFieldProps {
   previewSrc?: string;
 }
 
-export function ImageUploadField({ label, onImageUpload, previewSrc }: ImageUploadFieldProps) {
+export function ImageUploadField({
+  label,
+  onImageUpload,
+  previewSrc,
+}: ImageUploadFieldProps) {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -24,31 +28,29 @@ export function ImageUploadField({ label, onImageUpload, previewSrc }: ImageUplo
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700">
-        {label}
-      </label>
+      <label className='block text-sm font-medium text-gray-700'>{label}</label>
       <input
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-        className="mt-1 block w-full text-sm text-gray-500
+        accept='image/*'
+        className='mt-1 block w-full text-sm text-gray-500
           file:mr-4 file:py-2 file:px-4
           file:rounded-md file:border-0
           file:text-sm file:font-semibold
           file:bg-indigo-50 file:text-indigo-700
-          hover:file:bg-indigo-100"
+          hover:file:bg-indigo-100'
+        type='file'
+        onChange={handleFileChange}
       />
       {previewSrc && (
-        <div className="mt-2">
-          <Image 
-            src={previewSrc} 
-            alt="Preview" 
-            className="h-16 object-contain"
-            width={64}
+        <div className='mt-2'>
+          <Image
+            alt='Preview'
+            className='h-16 object-contain'
             height={64}
+            src={previewSrc}
+            width={64}
           />
         </div>
       )}
     </div>
   );
-} 
+}

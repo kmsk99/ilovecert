@@ -116,7 +116,7 @@ export const certificateABI = [
 ] as const;
 
 export async function getCertificate(
-  certificateId: string
+  certificateId: string,
 ): Promise<Certificate> {
   // TODO: 실제 컨트랙트 호출 로직 구현
   // 임시 더미 데이터 반환

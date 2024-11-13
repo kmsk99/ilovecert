@@ -7,7 +7,7 @@ export const optimizeImage = async (file: File): Promise<string> => {
 
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
@@ -18,7 +18,7 @@ export const optimizeImage = async (file: File): Promise<string> => {
           img.width,
           img.height,
           MAX_WIDTH,
-          MAX_HEIGHT
+          MAX_HEIGHT,
         );
 
         canvas.width = width;
@@ -42,7 +42,7 @@ export const calculateDimensions = (
   width: number,
   height: number,
   maxWidth: number,
-  maxHeight: number
+  maxHeight: number,
 ) => {
   if (width > height) {
     if (width > maxWidth) {

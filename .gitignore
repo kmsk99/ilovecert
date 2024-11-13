@@ -62,3 +62,6 @@ out/
 
 # Docs
 docs 
+
+# ESLint cache
+.eslintcache 
