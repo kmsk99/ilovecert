@@ -4,7 +4,12 @@ import { useState } from 'react';
 
 import html2canvas from 'html2canvas';
 import { toast } from 'sonner';
-import { useAccount, useSimulateContract, useWriteContract } from 'wagmi';
+import {
+  useAccount,
+  useSimulateContract,
+  useWriteContract,
+  useReadContract,
+} from 'wagmi';
 
 import { CertificatePreview } from './certificate-preview';
 import { ColorField } from './form-fields/ColorField';
@@ -41,6 +46,14 @@ export function CertificateForm() {
   const [metadataUri, setMetadataUri] = useState<string>('');
   const [formData, setFormData] =
     useState<CertificateFormData>(defaultFormData);
+
+  // 발급자 권한 확인
+  const { data: isIssuer } = useReadContract({
+    address: CONTRACT_ADDRESS,
+    abi: certificateABI,
+    functionName: 'issuers',
+    args: [address!],
+  });
 
   // 컨트랙트 호출 시뮬레이션
   const { data: simulateData } = useSimulateContract({
@@ -88,6 +101,11 @@ export function CertificateForm() {
         throw new Error('지갑이 연결되지 않았습니다.');
       }
 
+      // 발급자 권한 확인
+      if (!isIssuer) {
+        throw new Error('인증서 발급 권한이 없습니다.');
+      }
+
       setIsUploading(true);
       toast.loading('인증서 이미지를 생성하고 있습니다...');
 
@@ -130,7 +148,9 @@ export function CertificateForm() {
         throw new Error('컨트랙트 함수를 호출할 수 없습니다.');
 
       const metadataUri = `ipfs://${metadataHash}`;
-      console.log('Metadata URI:', metadataUri); // 디버깅용
+      console.log('Metadata URI:', metadataUri);
+      console.log('Issuer Address:', address);
+      console.log('Is Issuer:', isIssuer);
 
       toast.loading('블록체인에 인증서를 기록하고 있습니다...');
 
@@ -139,7 +159,7 @@ export function CertificateForm() {
         address: CONTRACT_ADDRESS,
         abi: certificateABI,
         functionName: 'issueCertificate',
-        args: [address, metadataUri],
+        args: [formData.recipientName, metadataUri], // 수령인 이름 사용
       });
     } catch (error) {
       console.error('인증서 발급 중 오류:', error);
@@ -151,6 +171,11 @@ export function CertificateForm() {
 
   return (
     <div className='grid grid-cols-2 gap-8 p-6'>
+      {!isIssuer && (
+        <div className='col-span-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4'>
+          ⚠️ 인증서를 발급하려면 발급자 권한이 필요합니다.
+        </div>
+      )}
       <div className='space-y-4'>
         <h2 className='text-2xl font-bold mb-6'>인증서 발급</h2>
         <form className='space-y-4' onSubmit={handleSubmit}>

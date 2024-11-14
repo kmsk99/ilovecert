@@ -2,10 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@react-pdf/renderer'],
-  webpack: (config) => {
+  webpack: config => {
     config.resolve.alias.canvas = false;
     config.resolve.alias.encoding = false;
-    
+
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
@@ -18,6 +18,6 @@ const nextConfig = {
 
     return config;
   },
-}
+};
 
-module.exports = nextConfig 
+module.exports = nextConfig;
