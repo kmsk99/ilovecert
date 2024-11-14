@@ -38,6 +38,7 @@ const defaultFormData: CertificateFormData = {
 export function CertificateForm() {
   const { address } = useAccount();
   const [isUploading, setIsUploading] = useState(false);
+  const [metadataUri, setMetadataUri] = useState<string>('');
   const [formData, setFormData] =
     useState<CertificateFormData>(defaultFormData);
 
@@ -54,6 +55,7 @@ export function CertificateForm() {
       onSuccess: () => {
         toast.success('인증서가 성공적으로 발급되었습니다.');
         setFormData(defaultFormData);
+        setMetadataUri('');
       },
       onError: error => {
         toast.error('인증서 발급 실패: ' + error.message);
@@ -82,6 +84,10 @@ export function CertificateForm() {
     e.preventDefault();
 
     try {
+      if (!address) {
+        throw new Error('지갑이 연결되지 않았습니다.');
+      }
+
       setIsUploading(true);
       toast.loading('인증서 이미지를 생성하고 있습니다...');
 
@@ -97,6 +103,7 @@ export function CertificateForm() {
       // 2. IPFS에 이미지 업로드
       toast.loading('이미지를 업로드하고 있습니다...');
       const imageHash = await uploadToIPFS(imageBlob);
+      console.log('Image Hash:', imageHash); // 디버깅용
 
       // 3. 메타데이터 생성
       const metadata = {
@@ -108,25 +115,31 @@ export function CertificateForm() {
 
       // 4. IPFS에 메타데이터 업로드
       toast.loading('메타데이터를 업로드하고 있습니다...');
-      const metadataHash = await uploadToIPFS(
-        new Blob([JSON.stringify(metadata)], { type: 'application/json' }),
-      );
+      const metadataBlob = new Blob([JSON.stringify(metadata)], {
+        type: 'application/json',
+      });
+      const metadataHash = await uploadToIPFS(metadataBlob);
+      console.log('Metadata Hash:', metadataHash); // 디버깅용
+
+      if (!metadataHash) {
+        throw new Error('메타데이터 해시를 받지 못했습니다.');
+      }
 
       // 5. 스마트 컨트랙트 호출
       if (!writeContract)
         throw new Error('컨트랙트 함수를 호출할 수 없습니다.');
 
-      // 시뮬레이션 확인
-      if (!simulateData?.result) {
-        throw new Error('컨트랙트 호출 시뮬레이션 실패');
-      }
+      const metadataUri = `ipfs://${metadataHash}`;
+      console.log('Metadata URI:', metadataUri); // 디버깅용
 
       toast.loading('블록체인에 인증서를 기록하고 있습니다...');
+
+      // 컨트랙트 호출
       writeContract({
         address: CONTRACT_ADDRESS,
         abi: certificateABI,
         functionName: 'issueCertificate',
-        args: [address!, `ipfs://${metadataHash}`],
+        args: [address, metadataUri],
       });
     } catch (error) {
       console.error('인증서 발급 중 오류:', error);
