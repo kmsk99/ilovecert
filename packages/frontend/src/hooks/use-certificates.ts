@@ -1,8 +1,9 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
+
 import { getCertificates } from '@/lib/contract';
 import { Certificate } from '@/types/certificate';
-import { useQuery } from '@tanstack/react-query';
 
 export function useCertificates(address: string | undefined) {
   return useQuery<Certificate[]>({

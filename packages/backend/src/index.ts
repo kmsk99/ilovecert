@@ -1,18 +1,18 @@
 import cors from 'cors';
-import dotenv from 'dotenv';
+import { config } from 'dotenv';
 import { ethers } from 'ethers';
-import express from 'express';
+import express, { json } from 'express';
 
 import { certificateABI } from './contract';
 import { Certificate } from './types';
 
-dotenv.config();
+config();
 
 const app = express();
 
 // 미들웨어 설정
 app.use(cors());
-app.use(express.json());
+app.use(json());
 
 // 이더리움 프로바이더 및 컨트랙트 설정
 const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);

@@ -1,5 +1,6 @@
-import { getCertificate } from '@/lib/contract';
 import { useQuery } from '@tanstack/react-query';
+
+import { getCertificate } from '@/lib/contract';
 
 export function useCertificate(certificateId: string) {
   return useQuery({

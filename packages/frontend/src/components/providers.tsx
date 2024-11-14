@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createConfig, http, WagmiProvider } from 'wagmi';
-import { hardhat, mainnet, sepolia } from 'wagmi/chains';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createConfig, http, WagmiProvider } from 'wagmi';
+import { hardhat, mainnet, sepolia } from 'wagmi/chains';
 
 const config = createConfig({
   chains: [mainnet, sepolia, hardhat],

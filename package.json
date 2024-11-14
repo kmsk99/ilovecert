@@ -9,8 +9,8 @@
     "deploy-contracts:sepolia": "pnpm --filter contracts run deploy:sepolia",
     "test": "pnpm -r run test",
     "test:contracts": "pnpm --filter contracts run test",
-    "lint": "eslint \"packages/**/*.{ts,tsx}\"",
-    "lint:fix": "eslint \"packages/**/*.{ts,tsx}\" --fix",
+    "lint": "pnpm -r run lint",
+    "lint:fix": "pnpm -r run lint:fix",
     "format": "prettier --write \"packages/**/*.{ts,tsx,json,md}\"",
     "format:check": "prettier --check \"packages/**/*.{ts,tsx,json,md}\""
   },
