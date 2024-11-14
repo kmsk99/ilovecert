@@ -5,7 +5,7 @@ contract CertificateContract {
     struct Certificate {
         uint256 id;
         address issuer;
-        address recipient;
+        string recipientName;
         string metadataURI;
         uint256 issuedAt;
         bool isValid;
@@ -13,10 +13,12 @@ contract CertificateContract {
 
     mapping(uint256 => Certificate) public certificates;
     mapping(address => bool) public issuers;
+    mapping(address => uint256[]) public userCertificates;
+    
     uint256 private _certificateCounter;
     address public admin;
 
-    event CertificateIssued(uint256 indexed id, address indexed issuer, address indexed recipient);
+    event CertificateIssued(uint256 indexed id, address indexed issuer, string recipientName);
     event CertificateRevoked(uint256 indexed id);
     event IssuerAdded(address indexed issuer);
     event IssuerRemoved(address indexed issuer);
@@ -37,27 +39,39 @@ contract CertificateContract {
     }
 
     function addIssuer(address issuer) external onlyAdmin {
+        require(!issuers[issuer], "Already an issuer");
         issuers[issuer] = true;
         emit IssuerAdded(issuer);
     }
 
     function removeIssuer(address issuer) external onlyAdmin {
+        require(issuer != admin, "Cannot remove admin");
+        require(issuers[issuer], "Not an issuer");
         issuers[issuer] = false;
         emit IssuerRemoved(issuer);
     }
 
-    function issueCertificate(address recipient, string memory metadataURI) external onlyIssuer returns (uint256) {
+    function issueCertificate(
+        string memory recipientName,
+        string memory metadataURI
+    ) external onlyIssuer returns (uint256) {
+        require(bytes(recipientName).length > 0, "Recipient name cannot be empty");
+        require(bytes(metadataURI).length > 0, "Metadata URI cannot be empty");
+
         _certificateCounter++;
+        
         certificates[_certificateCounter] = Certificate({
             id: _certificateCounter,
             issuer: msg.sender,
-            recipient: recipient,
+            recipientName: recipientName,
             metadataURI: metadataURI,
             issuedAt: block.timestamp,
             isValid: true
         });
 
-        emit CertificateIssued(_certificateCounter, msg.sender, recipient);
+        userCertificates[msg.sender].push(_certificateCounter);
+
+        emit CertificateIssued(_certificateCounter, msg.sender, recipientName);
         return _certificateCounter;
     }
 
@@ -72,5 +86,28 @@ contract CertificateContract {
 
     function validateCertificate(uint256 certificateId) external view returns (bool) {
         return certificates[certificateId].isValid;
+    }
+
+    function getUserCertificates(address user) external view returns (uint256[] memory) {
+        return userCertificates[user];
+    }
+
+    function getCertificate(uint256 certificateId) external view returns (
+        uint256 id,
+        address issuer,
+        string memory recipientName,
+        string memory metadataURI,
+        uint256 issuedAt,
+        bool isValid
+    ) {
+        Certificate memory cert = certificates[certificateId];
+        return (
+            cert.id,
+            cert.issuer,
+            cert.recipientName,
+            cert.metadataURI,
+            cert.issuedAt,
+            cert.isValid
+        );
     }
 } 

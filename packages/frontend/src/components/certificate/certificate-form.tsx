@@ -60,7 +60,10 @@ export function CertificateForm() {
     address: CONTRACT_ADDRESS,
     abi: certificateABI,
     functionName: 'issueCertificate',
-    args: [address!, ''],
+    args: [address as `0x${string}`, ''],
+    query: {
+      enabled: Boolean(address) && Boolean(isIssuer) && Boolean(metadataUri),
+    },
   });
 
   const { writeContract, isPending } = useWriteContract({
@@ -159,7 +162,7 @@ export function CertificateForm() {
         address: CONTRACT_ADDRESS,
         abi: certificateABI,
         functionName: 'issueCertificate',
-        args: [formData.recipientName, metadataUri], // 수령인 이름 사용
+        args: [formData.recipientName, metadataUri],
       });
     } catch (error) {
       console.error('인증서 발급 중 오류:', error);

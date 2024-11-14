@@ -30,7 +30,10 @@ export function useIsIssuer(address?: string) {
     address: CONTRACT_ADDRESS,
     abi: certificateABI,
     functionName: 'issuers',
-    args: [address as string],
+    args: address ? [address as `0x${string}`] : undefined,
+    query: {
+      enabled: Boolean(address),
+    },
   });
 }
 

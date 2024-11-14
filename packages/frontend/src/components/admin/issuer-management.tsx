@@ -60,7 +60,7 @@ export function IssuerManagement() {
         address: CONTRACT_ADDRESS,
         abi: certificateABI,
         functionName: 'addIssuer',
-        args: [newIssuerAddress],
+        args: [newIssuerAddress as `0x${string}`],
       });
     } catch (error) {
       console.error('발급자 추가 중 오류:', error);
@@ -78,7 +78,7 @@ export function IssuerManagement() {
         address: CONTRACT_ADDRESS,
         abi: certificateABI,
         functionName: 'removeIssuer',
-        args: [issuerAddress],
+        args: [issuerAddress as `0x${string}`],
       });
     } catch (error) {
       console.error('발급자 제거 중 오류:', error);
