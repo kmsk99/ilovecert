@@ -64,6 +64,7 @@ export function CertificatePreview({
       <div
         ref={certificateRef}
         className='w-full aspect-[1/1.414] p-8 flex flex-col'
+        id='certificate-preview'
         style={{
           backgroundColor: bgColor,
           border: `8px double ${borderColor}`,

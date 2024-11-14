@@ -2,12 +2,19 @@
 
 import { useState } from 'react';
 
-import { CertificateFormData } from '@/types/certificate';
+import html2canvas from 'html2canvas';
+import { toast } from 'sonner';
+import { useAccount, useSimulateContract, useWriteContract } from 'wagmi';
 
 import { CertificatePreview } from './certificate-preview';
 import { ColorField } from './form-fields/ColorField';
 import { ImageUploadField } from './form-fields/ImageUploadField';
 import { TextField } from './form-fields/TextField';
+
+import { certificateABI } from '@/config/abi';
+import { CONTRACT_ADDRESS } from '@/config/contract';
+import { uploadToIPFS } from '@/lib/ipfs';
+import { CertificateFormData } from '@/types/certificate';
 
 const defaultFormData: CertificateFormData = {
   recipientName: '',
@@ -29,8 +36,30 @@ const defaultFormData: CertificateFormData = {
 };
 
 export function CertificateForm() {
+  const { address } = useAccount();
+  const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] =
     useState<CertificateFormData>(defaultFormData);
+
+  // 컨트랙트 호출 시뮬레이션
+  const { data: simulateData } = useSimulateContract({
+    address: CONTRACT_ADDRESS,
+    abi: certificateABI,
+    functionName: 'issueCertificate',
+    args: [address!, ''],
+  });
+
+  const { writeContract, isPending } = useWriteContract({
+    mutation: {
+      onSuccess: () => {
+        toast.success('인증서가 성공적으로 발급되었습니다.');
+        setFormData(defaultFormData);
+      },
+      onError: error => {
+        toast.error('인증서 발급 실패: ' + error.message);
+      },
+    },
+  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -51,7 +80,60 @@ export function CertificateForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+
+    try {
+      setIsUploading(true);
+      toast.loading('인증서 이미지를 생성하고 있습니다...');
+
+      // 1. 미리보기 이미지를 캡처
+      const previewElement = document.getElementById('certificate-preview');
+      if (!previewElement) throw new Error('미리보기를 찾을 수 없습니다.');
+
+      const canvas = await html2canvas(previewElement);
+      const imageBlob = await new Promise<Blob>(resolve => {
+        canvas.toBlob(blob => resolve(blob!), 'image/png');
+      });
+
+      // 2. IPFS에 이미지 업로드
+      toast.loading('이미지를 업로드하고 있습니다...');
+      const imageHash = await uploadToIPFS(imageBlob);
+
+      // 3. 메타데이터 생성
+      const metadata = {
+        ...formData,
+        image: `ipfs://${imageHash}`,
+        recipient: address,
+        createdAt: new Date().toISOString(),
+      };
+
+      // 4. IPFS에 메타데이터 업로드
+      toast.loading('메타데이터를 업로드하고 있습니다...');
+      const metadataHash = await uploadToIPFS(
+        new Blob([JSON.stringify(metadata)], { type: 'application/json' }),
+      );
+
+      // 5. 스마트 컨트랙트 호출
+      if (!writeContract)
+        throw new Error('컨트랙트 함수를 호출할 수 없습니다.');
+
+      // 시뮬레이션 확인
+      if (!simulateData?.result) {
+        throw new Error('컨트랙트 호출 시뮬레이션 실패');
+      }
+
+      toast.loading('블록체인에 인증서를 기록하고 있습니다...');
+      writeContract({
+        address: CONTRACT_ADDRESS,
+        abi: certificateABI,
+        functionName: 'issueCertificate',
+        args: [address!, `ipfs://${metadataHash}`],
+      });
+    } catch (error) {
+      console.error('인증서 발급 중 오류:', error);
+      toast.error((error as Error).message);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -124,10 +206,15 @@ export function CertificateForm() {
             onImageUpload={handleLogoUpload}
           />
           <button
-            className='w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+            className='w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50'
+            disabled={isUploading || isPending}
             type='submit'
           >
-            인증서 발급
+            {isUploading
+              ? '업로드 중...'
+              : isPending
+                ? '발급 중...'
+                : '인증서 발급'}
           </button>
         </form>
       </div>

@@ -4,6 +4,7 @@ import React from 'react';
 
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Toaster } from 'sonner';
 
 import { Providers } from '@/components/providers';
 
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html suppressHydrationWarning lang='ko'>
       <body suppressHydrationWarning className={inter.className}>
         <Providers>{children}</Providers>
+        <Toaster richColors position='top-right' />
       </body>
     </html>
   );
