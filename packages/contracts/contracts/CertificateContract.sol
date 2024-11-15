@@ -13,7 +13,7 @@ contract CertificateContract {
 
     mapping(uint256 => Certificate) public certificates;
     mapping(address => bool) public issuers;
-    mapping(address => uint256[]) public userCertificates;
+    mapping(address => uint256[]) private userCertificates;
     
     uint256 private _certificateCounter;
     address public admin;
@@ -89,7 +89,26 @@ contract CertificateContract {
     }
 
     function getUserCertificates(address user) external view returns (uint256[] memory) {
-        return userCertificates[user];
+        uint256[] memory allCertificates = userCertificates[user];
+        uint256 validCount = 0;
+        
+        for(uint256 i = 0; i < allCertificates.length; i++) {
+            if(certificates[allCertificates[i]].isValid) {
+                validCount++;
+            }
+        }
+        
+        uint256[] memory validCertificates = new uint256[](validCount);
+        uint256 currentIndex = 0;
+        
+        for(uint256 i = 0; i < allCertificates.length; i++) {
+            if(certificates[allCertificates[i]].isValid) {
+                validCertificates[currentIndex] = allCertificates[i];
+                currentIndex++;
+            }
+        }
+        
+        return validCertificates;
     }
 
     function getCertificate(uint256 certificateId) external view returns (
