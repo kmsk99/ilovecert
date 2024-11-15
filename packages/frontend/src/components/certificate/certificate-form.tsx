@@ -9,6 +9,7 @@ import {
   useSimulateContract,
   useWriteContract,
   useReadContract,
+  usePublicClient,
 } from 'wagmi';
 
 import { CertificatePreview } from './certificate-preview';
@@ -66,16 +67,36 @@ export function CertificateForm() {
     },
   });
 
+  const publicClient = usePublicClient();
+
   const { writeContract, isPending } = useWriteContract({
     mutation: {
-      onSuccess: () => {
-        toast.dismiss();
-        toast.success('인증서가 성공적으로 발급되었습니다.');
-        setFormData(defaultFormData);
-        setMetadataUri('');
+      onSuccess: async hash => {
+        console.log('Transaction hash:', hash);
+
+        try {
+          const receipt = await publicClient?.waitForTransactionReceipt({
+            hash,
+          });
+
+          console.log('Transaction receipt:', receipt);
+          console.log('Block number:', receipt?.blockNumber);
+          console.log('Status:', receipt?.status);
+
+          if (receipt?.status === 'success') {
+            toast.success('인증서가 성공적으로 블록체인에 기록되었습니다.');
+            setFormData(defaultFormData);
+            setMetadataUri('');
+          } else {
+            toast.error('트랜잭션이 실패했습니다.');
+          }
+        } catch (error) {
+          console.error('Transaction receipt error:', error);
+          toast.error('트랜잭션 확인 중 오류가 발생했습니다.');
+        }
       },
       onError: error => {
-        toast.dismiss();
+        console.error('Transaction error:', error);
         toast.error('인증서 발급 실패: ' + error.message);
       },
     },
@@ -164,18 +185,22 @@ export function CertificateForm() {
         metadataUri,
       });
 
-      const contractLoadingId = toast.loading(
-        '블록체인에 인증서를 기록하고 있습니다...',
-      );
+      try {
+        const tx = await writeContract({
+          address: CONTRACT_ADDRESS,
+          abi: certificateABI,
+          functionName: 'issueCertificate',
+          args: [formData.recipientName, metadataUri],
+        });
 
-      await writeContract({
-        address: CONTRACT_ADDRESS,
-        abi: certificateABI,
-        functionName: 'issueCertificate',
-        args: [formData.recipientName, metadataUri],
-      });
+        // writeContract의 onSuccess에서 처리되므로 여기서는 추가 처리 불필요
+      } catch (contractError) {
+        console.error('Contract call error:', contractError);
+        throw new Error(
+          `컨트랙트 호출 실패: ${(contractError as Error).message}`,
+        );
+      }
 
-      toast.dismiss(contractLoadingId);
       toast.success('인증서가 성공적으로 발급되었습니다.');
       setFormData(defaultFormData);
     } catch (error) {

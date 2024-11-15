@@ -16,6 +16,19 @@ module.exports = {
   },
   networks: {
     hardhat: {
+      mining: {
+        auto: true,
+        interval: 0
+      },
+      chainId: 31337,
+    },
+    localhost: {
+      url: "http://127.0.0.1:8545",
+      mining: {
+        auto: true,
+        interval: 0
+      },
+      chainId: 31337,
     },
     sepolia: {
       url: process.env.SEPOLIA_URL || "",
