@@ -1,11 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
+import { useContractRead } from 'wagmi';
 
-import { getCertificate } from '@/lib/contract';
+import { certificateABI } from '@/config/abi';
 
 export function useCertificate(certificateId: string) {
-  return useQuery({
-    queryKey: ['certificate', certificateId],
-    queryFn: () => getCertificate(certificateId),
-    enabled: !!certificateId,
+  return useContractRead({
+    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`,
+    abi: certificateABI,
+    functionName: 'getCertificate',
+    args: [BigInt(certificateId)],
   });
 }

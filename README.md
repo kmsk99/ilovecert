@@ -38,21 +38,20 @@ NEXT_PUBLIC_GATEWAY_URL=your_pinata_gateway_url
 
 3. 개발 환경 실행
 
-터미널 1 - Hardhat 노드:
+단일 명령어로 실행:
 ```bash
-cd packages/contracts
-npx hardhat node
+pnpm start:dev
 ```
 
-터미널 2 - 컨트랙트 배포:
+또는 개별적으로 실행:
 ```bash
-cd packages/contracts
-npx hardhat run scripts/deploy.js --network localhost
-```
+# Hardhat 노드 실행
+pnpm node
 
-터미널 3 - 프론트엔드:
-```bash
-cd packages/frontend
+# 컨트랙트 배포
+pnpm deploy-contracts
+
+# 프론트엔드 실행
 pnpm dev
 ```
 
@@ -105,17 +104,21 @@ iLoveCert/
 ## 테스트
 
 ```bash
-# 스마트 컨트랙트 테스트
-cd packages/contracts
-npx hardhat test
+# 모든 패키지 테스트
+pnpm test
+
+# 스마트 컨트랙트만 테스트
+pnpm test:contracts
 ```
 
 ## 배포 (테스트넷)
 
 ```bash
-# 컨트랙트 배포 (Sepolia)
-cd packages/contracts
-npx hardhat run scripts/deploy.js --network sepolia
+# Sepolia 테스트넷 배포
+pnpm deploy-contracts:sepolia
+
+# Mumbai 테스트넷 배포
+pnpm deploy-contracts:mumbai
 ```
 
 ## 라이선스

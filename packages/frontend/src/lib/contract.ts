@@ -1,153 +1,91 @@
+import { http, createConfig, readContract } from '@wagmi/core';
+import { polygonMumbai } from 'wagmi/chains';
+
+import { certificateABI } from '@/config/abi';
 import { Certificate } from '@/types/certificate';
 
-export const certificateABI = [
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: 'certificateId',
-        type: 'uint256',
-      },
-    ],
-    name: 'getCertificate',
-    outputs: [
-      {
-        components: [
-          {
-            internalType: 'uint256',
-            name: 'id',
-            type: 'uint256',
-          },
-          {
-            internalType: 'string',
-            name: 'ipfsHash',
-            type: 'string',
-          },
-          {
-            internalType: 'address',
-            name: 'recipient',
-            type: 'address',
-          },
-          {
-            internalType: 'uint256',
-            name: 'issuedAt',
-            type: 'uint256',
-          },
-          {
-            internalType: 'bool',
-            name: 'isValid',
-            type: 'bool',
-          },
-          {
-            internalType: 'string',
-            name: 'certificateType',
-            type: 'string',
-          },
-          {
-            internalType: 'string',
-            name: 'issuerName',
-            type: 'string',
-          },
-        ],
-        internalType: 'struct CertificateStorage.Certificate',
-        name: '',
-        type: 'tuple',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
+const config = createConfig({
+  chains: [polygonMumbai],
+  transports: {
+    [polygonMumbai.id]: http(),
   },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'user',
-        type: 'address',
-      },
-    ],
-    name: 'getUserCertificates',
-    outputs: [
-      {
-        components: [
-          {
-            internalType: 'uint256',
-            name: 'id',
-            type: 'uint256',
-          },
-          {
-            internalType: 'string',
-            name: 'ipfsHash',
-            type: 'string',
-          },
-          {
-            internalType: 'address',
-            name: 'recipient',
-            type: 'address',
-          },
-          {
-            internalType: 'uint256',
-            name: 'issuedAt',
-            type: 'uint256',
-          },
-          {
-            internalType: 'bool',
-            name: 'isValid',
-            type: 'bool',
-          },
-          {
-            internalType: 'string',
-            name: 'certificateType',
-            type: 'string',
-          },
-          {
-            internalType: 'string',
-            name: 'issuerName',
-            type: 'string',
-          },
-        ],
-        internalType: 'struct CertificateStorage.Certificate[]',
-        name: '',
-        type: 'tuple[]',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-] as const;
+});
+
+const CONTRACT_ADDRESS = process.env
+  .NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+
+type ContractCertificate = {
+  id: bigint;
+  issuer: `0x${string}`;
+  recipientName: string;
+  metadataURI: string;
+  issuedAt: bigint;
+  isValid: boolean;
+  certificateType: string;
+};
 
 export async function getCertificate(
   certificateId: string,
 ): Promise<Certificate> {
-  // TODO: 실제 컨트랙트 호출 로직 구현
-  // 임시 더미 데이터 반환
-  return {
-    id: certificateId,
-    name: '샘플 인증서',
-    description: '이것은 샘플 인증서입니다.',
-    recipient: '0x1234...5678',
-    issuer: '0x8765...4321',
-    issuedAt: Date.now(),
-    imageUrl: '/sample-certificate.png',
-  };
+  try {
+    const result = await readContract(config, {
+      address: CONTRACT_ADDRESS,
+      abi: certificateABI,
+      functionName: 'getCertificate',
+      args: [BigInt(certificateId)],
+    });
+
+    const [
+      id,
+      issuer,
+      recipientName,
+      metadataURI,
+      issuedAt,
+      isValid,
+      certificateType,
+    ] = result as [
+      bigint,
+      `0x${string}`,
+      string,
+      string,
+      bigint,
+      boolean,
+      string,
+    ];
+
+    return {
+      id: String(id),
+      name: certificateType,
+      description: '',
+      recipient: recipientName,
+      issuer: issuer,
+      issuedAt: Number(issuedAt) * 1000,
+      imageUrl: `${process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL}/${metadataURI}`,
+    };
+  } catch (error) {
+    console.error('Certificate fetch error:', error);
+    throw new Error('인증서를 가져오는데 실패했습니다.');
+  }
 }
 
 export async function getCertificates(address: string): Promise<Certificate[]> {
-  // TODO: 실제 컨트랙트 호출 로직 구현
-  // 임시 더미 데이터 반환
-  return [
-    {
-      id: '1',
-      name: '샘플 인증서 1',
-      recipient: address,
-      issuer: '0x8765...4321',
-      issuedAt: Date.now() - 86400000,
-    },
-    {
-      id: '2',
-      name: '샘플 인증서 2',
-      recipient: address,
-      issuer: '0x8765...4321',
-      issuedAt: Date.now(),
-    },
-  ];
+  try {
+    const certificateIds = (await readContract(config, {
+      address: CONTRACT_ADDRESS,
+      abi: certificateABI,
+      functionName: 'getUserCertificates',
+      args: [address as `0x${string}`],
+    })) as bigint[];
+
+    if (!certificateIds.length) return [];
+
+    const certificates = await Promise.all(
+      certificateIds.map(id => getCertificate(String(id))),
+    );
+
+    return certificates;
+  } catch (error) {
+    console.error('Certificates fetch error:', error);
+    throw new Error('인증서 목록을 가져오는데 실패했습니다.');
+  }
 }

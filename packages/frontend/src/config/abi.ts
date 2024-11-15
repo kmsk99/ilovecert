@@ -134,6 +134,11 @@ export const certificateABI = [
         name: 'isValid',
         type: 'bool',
       },
+      {
+        internalType: 'string',
+        name: 'certificateType',
+        type: 'string',
+      },
     ],
     stateMutability: 'view',
     type: 'function',
@@ -177,6 +182,11 @@ export const certificateABI = [
         internalType: 'bool',
         name: 'isValid',
         type: 'bool',
+      },
+      {
+        internalType: 'string',
+        name: 'certificateType',
+        type: 'string',
       },
     ],
     stateMutability: 'view',
