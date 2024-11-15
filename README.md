@@ -56,13 +56,33 @@ pnpm dev
 ```
 
 4. MetaMask 설정
+- MetaMask 초기화:
+  1. MetaMask 설정(Settings) > 고급(Advanced) > 계정 초기화(Reset Account) 클릭
+  2. MetaMask 설정 > 네트워크 > Localhost 8545 삭제 (이미 있는 경우)
+
 - Hardhat의 첫 번째 계정(Account #0) 가져오기:
-  - 개인키: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+  1. MetaMask에서 계정 가져오기(Import Account) 클릭
+  2. 개인키 입력: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+
 - Localhost 8545 네트워크 추가:
-  - 네트워크 이름: Localhost 8545
-  - RPC URL: http://127.0.0.1:8545
-  - 체인 ID: 31337
-  - 통화 기호: ETH
+  1. 네트워크 추가(Add Network) 클릭
+  2. 수동으로 추가:
+     - 네트워크 이름: Localhost 8545
+     - RPC URL: http://127.0.0.1:8545
+     - 체인 ID: 31337
+     - 통화 기호: ETH
+
+5. 개발 환경 실행
+```bash
+# 1. 모든 프로세스 종료 및 초기화
+pnpm clean
+
+# 2. Hardhat 노드 초기화
+pnpm reset-node
+
+# 3. 전체 개발 환경 실행
+pnpm start:dev
+```
 
 ## 주요 기능
 

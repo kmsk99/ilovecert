@@ -4,17 +4,17 @@ import { polygonMumbai } from 'wagmi/chains';
 import { certificateABI } from '@/config/abi';
 import { Certificate } from '@/types/certificate';
 
-const config = createConfig({
+export const config = createConfig({
   chains: [polygonMumbai],
   transports: {
     [polygonMumbai.id]: http(),
   },
 });
 
-const CONTRACT_ADDRESS = process.env
+export const CONTRACT_ADDRESS = process.env
   .NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
 
-type ContractCertificate = {
+export type ContractCertificate = {
   id: bigint;
   issuer: `0x${string}`;
   recipientName: string;
@@ -53,14 +53,16 @@ export async function getCertificate(
       string,
     ];
 
+    const ipfsHash = metadataURI.replace('ipfs://', '');
+
     return {
       id: String(id),
       name: certificateType,
       description: '',
       recipient: recipientName,
-      issuer: issuer,
+      issuer,
       issuedAt: Number(issuedAt) * 1000,
-      imageUrl: `${process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL}/${metadataURI}`,
+      imageUrl: `${process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL}/${ipfsHash}`,
     };
   } catch (error) {
     console.error('Certificate fetch error:', error);
@@ -70,13 +72,14 @@ export async function getCertificate(
 
 export async function getCertificates(address: string): Promise<Certificate[]> {
   try {
-    const certificateIds = (await readContract(config, {
+    const result = await readContract(config, {
       address: CONTRACT_ADDRESS,
       abi: certificateABI,
       functionName: 'getUserCertificates',
       args: [address as `0x${string}`],
-    })) as bigint[];
+    });
 
+    const certificateIds = result as bigint[];
     if (!certificateIds.length) return [];
 
     const certificates = await Promise.all(

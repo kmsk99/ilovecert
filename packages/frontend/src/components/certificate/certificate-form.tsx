@@ -111,74 +111,73 @@ export function CertificateForm() {
       }
 
       setIsUploading(true);
-      const imageLoadingId = toast.loading(
-        '인증서 이미지를 생성하고 있습니다...',
-      );
 
       // 1. 미리보기 이미지를 캡처
       const previewElement = document.getElementById('certificate-preview');
       if (!previewElement) throw new Error('미리보기를 찾을 수 없습니다.');
 
       const canvas = await html2canvas(previewElement);
-      const imageBlob = await new Promise<Blob>(resolve => {
-        canvas.toBlob(blob => resolve(blob!), 'image/png');
+      const imageBlob = await new Promise<Blob | null>(resolve => {
+        canvas.toBlob(blob => resolve(blob), 'image/png');
       });
 
-      toast.dismiss(imageLoadingId);
-      const uploadLoadingId = toast.loading('이미지를 업로드하고 있습니다...');
+      let imageHash = '';
 
-      // 2. IPFS에 이미지 업로드
-      const imageHash = await uploadToIPFS(imageBlob);
-      console.log('Image Hash:', imageHash);
+      if (imageBlob) {
+        // 2. IPFS에 이미지 업로드
+        const imageLoadingId = toast.loading(
+          '인증서 이미지를 업로드하고 있습니다...',
+        );
+        imageHash = await uploadToIPFS(imageBlob);
+        toast.dismiss(imageLoadingId);
 
-      toast.dismiss(uploadLoadingId);
+        if (!imageHash) {
+          throw new Error('이미지 업로드에 실패했습니다.');
+        }
+      }
+
+      // 3. 메타데이터 생성 및 업로드
       const metadataLoadingId = toast.loading(
         '메타데이터를 업로드하고 있습니다...',
       );
-
-      // 3. 메타데이터 생성
       const metadata = {
         ...formData,
-        image: `ipfs://${imageHash}`,
-        recipient: address,
+        image: imageHash ? `ipfs://${imageHash}` : '',
+        recipient: formData.recipientName,
         createdAt: new Date().toISOString(),
       };
 
-      // 4. IPFS에 메타데이터 업로드
       const metadataBlob = new Blob([JSON.stringify(metadata)], {
         type: 'application/json',
       });
       const metadataHash = await uploadToIPFS(metadataBlob);
-      console.log('Metadata Hash:', metadataHash);
-
-      if (!metadataHash) {
-        throw new Error('메타데이터 해시를 받지 못했습니다.');
-      }
-
       toast.dismiss(metadataLoadingId);
 
-      // 5. 스마트 컨트랙트 호출
-      if (!writeContract) {
-        throw new Error('컨트랙트 함수를 호출할 수 없습니다.');
+      if (!metadataHash) {
+        throw new Error('메타데이터 업로드에 실패했습니다.');
       }
 
+      // 4. 스마트 컨트랙트 호출
       const metadataUri = `ipfs://${metadataHash}`;
-      console.log('Metadata URI:', metadataUri);
-      console.log('Issuer Address:', address);
-      console.log('Is Issuer:', isIssuer);
-
-      // 컨트랙트 호출 전 로딩 메시지 표시
-      toast.loading('블록체인에 인증서를 기록하고 있습니다...', {
-        duration: Infinity, // 무기한 지속
+      console.log('Contract call params:', {
+        recipientName: formData.recipientName,
+        metadataUri,
       });
 
-      // 컨트랙트 호출
-      writeContract({
+      const contractLoadingId = toast.loading(
+        '블록체인에 인증서를 기록하고 있습니다...',
+      );
+
+      await writeContract({
         address: CONTRACT_ADDRESS,
         abi: certificateABI,
         functionName: 'issueCertificate',
         args: [formData.recipientName, metadataUri],
       });
+
+      toast.dismiss(contractLoadingId);
+      toast.success('인증서가 성공적으로 발급되었습니다.');
+      setFormData(defaultFormData);
     } catch (error) {
       console.error('인증서 발급 중 오류:', error);
       toast.dismiss();
