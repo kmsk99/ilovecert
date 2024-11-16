@@ -5,7 +5,7 @@ export interface Certificate {
   recipient: string;
   issuer: string;
   issuedAt: number;
-  imageUrl?: string;
+  metadataURI?: string;
 }
 
 export type CertificateFormData = {

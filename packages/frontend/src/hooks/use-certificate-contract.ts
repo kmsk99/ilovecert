@@ -43,7 +43,7 @@ async function uploadCertificateData(
   );
   const metadata = {
     ...formData,
-    image: `ipfs://${imageHash}`,
+    image: `https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${imageHash}`,
     recipient: formData.recipientName,
     createdAt: new Date().toISOString(),
   };
@@ -58,7 +58,7 @@ async function uploadCertificateData(
     throw new Error('메타데이터 업로드에 실패했습니다.');
   }
 
-  return `ipfs://${metadataHash}`;
+  return `https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${metadataHash}`;
 }
 
 export function useCertificateContract() {

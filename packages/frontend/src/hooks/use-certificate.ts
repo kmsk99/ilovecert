@@ -31,10 +31,6 @@ export function useCertificate(certificateId: string) {
     certificateType,
   ] = data as [bigint, `0x${string}`, string, string, bigint, boolean, string];
 
-  const ipfsHash = metadataURI.replace('ipfs://', '');
-
-  const imageUrl = `https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${ipfsHash}`;
-
   return {
     id: String(id),
     name: certificateType,
@@ -42,7 +38,7 @@ export function useCertificate(certificateId: string) {
     recipient: recipientName,
     issuer,
     issuedAt: Number(issuedAt) * 1000,
-    imageUrl,
+    metadataURI,
   };
 }
 

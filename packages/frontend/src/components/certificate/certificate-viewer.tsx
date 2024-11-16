@@ -28,10 +28,10 @@ export function CertificateViewer({ certificateId }: CertificateViewerProps) {
 
   useEffect(() => {
     async function fetchMetadata() {
-      if (!certificate?.imageUrl) return;
+      if (!certificate?.metadataURI) return;
 
       try {
-        const response = await fetch(certificate?.imageUrl);
+        const response = await fetch(certificate?.metadataURI);
         const data = await response.json();
         setMetadata(data);
       } catch (error) {
@@ -89,14 +89,14 @@ export function CertificateViewer({ certificateId }: CertificateViewerProps) {
         </div>
 
         <div className='relative'>
-          {certificate.imageUrl && (
+          {metadata.image && (
             <div className='relative w-full aspect-[3/4] rounded-lg overflow-hidden shadow-lg'>
               <Image
                 fill
                 priority
                 alt='Certificate'
                 className='object-contain'
-                src={certificate.imageUrl}
+                src={metadata.image}
               />
             </div>
           )}
