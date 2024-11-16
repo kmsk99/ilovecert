@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import Image from 'next/image';
 
 import { useCertificate } from '@/hooks/use-certificate';
@@ -26,6 +28,7 @@ export function CertificateViewer({ certificateId }: CertificateViewerProps) {
   const certificate = useCertificate(certificateId);
   const [metadata, setMetadata] = useState<MetadataType | null>(null);
   const [isMetadataLoading, setIsMetadataLoading] = useState(true);
+  const certificateRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function fetchMetadata() {
@@ -46,6 +49,40 @@ export function CertificateViewer({ certificateId }: CertificateViewerProps) {
       fetchMetadata();
     }
   }, [certificate]);
+
+  const downloadPDF = async () => {
+    if (!certificateRef.current) return;
+
+    try {
+      const canvas = await html2canvas(certificateRef.current, {
+        scale: 1.5,
+        logging: false,
+        useCORS: true,
+        backgroundColor: null,
+      });
+
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/jpeg', 0.8);
+
+      pdf.addImage(
+        imgData,
+        'JPEG',
+        0,
+        0,
+        imgWidth,
+        imgHeight,
+        undefined,
+        'FAST',
+      );
+
+      pdf.save(`${certificate?.name}_${metadata?.recipient}.pdf`);
+    } catch (error) {
+      console.error('PDF 생성 중 오류:', error);
+    }
+  };
 
   if (!certificate || isMetadataLoading) {
     return (
@@ -108,7 +145,7 @@ export function CertificateViewer({ certificateId }: CertificateViewerProps) {
         <div className='pt-6 border-t border-gray-200'>
           <button
             className='w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2'
-            onClick={() => window.print()}
+            onClick={downloadPDF}
           >
             <svg
               className='w-5 h-5'
@@ -123,14 +160,17 @@ export function CertificateViewer({ certificateId }: CertificateViewerProps) {
                 strokeWidth={2}
               />
             </svg>
-            인증서 다운로드
+            PDF 다운로드
           </button>
         </div>
       </div>
 
       <div className='relative'>
         {metadata.image && (
-          <div className='relative aspect-[1/1.414] overflow-hidden shadow-xl border border-gray-200'>
+          <div
+            ref={certificateRef}
+            className='relative aspect-[1/1.414] overflow-hidden shadow-xl border border-gray-200'
+          >
             <Image
               fill
               priority
