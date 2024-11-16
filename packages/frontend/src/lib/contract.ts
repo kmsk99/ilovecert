@@ -1,7 +1,6 @@
 import {
   useReadContract,
   useReadContracts,
-  usePublicClient,
   useWaitForTransactionReceipt,
 } from 'wagmi';
 
@@ -57,26 +56,6 @@ export function useCertificate(certificateId: string) {
   };
 }
 
-export function useResetNonce() {
-  const publicClient = usePublicClient({
-    chainId: 8453,
-  });
-
-  const resetNonce = async (address: string) => {
-    try {
-      await publicClient?.prepareTransactionRequest({
-        to: address as `0x${string}`,
-        value: BigInt(0),
-        nonce: 0,
-      });
-    } catch (error) {
-      console.error('Failed to reset nonce:', error);
-    }
-  };
-
-  return resetNonce;
-}
-
 export function useWatchTransaction(transactionHash: `0x${string}`) {
   const {
     data: receipt,
@@ -97,8 +76,6 @@ export function useWatchTransaction(transactionHash: `0x${string}`) {
 }
 
 export function useUserCertificates(address?: string) {
-  const resetNonce = useResetNonce();
-
   const {
     data: certificateIds,
     isError: idsError,

@@ -9,7 +9,6 @@ import {
 
 import { certificateABI } from '@/config/abi';
 import { CONTRACT_ADDRESS } from '@/config/contract';
-import { useResetNonce } from '@/lib/contract';
 import { uploadToIPFS } from '@/lib/ipfs';
 import { CertificateFormData } from '@/types/certificate';
 
@@ -64,7 +63,6 @@ async function uploadCertificateData(
 
 export function useCertificateContract() {
   const { address } = useAccount();
-  const resetNonce = useResetNonce();
   const publicClient = usePublicClient();
 
   const { data: isIssuer } = useReadContract({
@@ -84,9 +82,6 @@ export function useCertificateContract() {
 
           if (receipt?.status === 'success') {
             toast.success('인증서가 성공적으로 블록체인에 기록되었습니다.');
-            if (address) {
-              await resetNonce(address);
-            }
           } else {
             toast.error('트랜잭션이 실패했습니다.');
           }
