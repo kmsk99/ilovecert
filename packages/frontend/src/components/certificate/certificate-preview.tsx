@@ -142,14 +142,6 @@ export function CertificatePreview({
             </div>
           </div>
         </div>
-
-        <div
-          className='absolute top-0 right-0 w-48 h-48 opacity-[0.03]'
-          style={{
-            backgroundColor: borderColor,
-            clipPath: 'polygon(100% 0, 0 0, 100% 100%)',
-          }}
-        />
       </div>
 
       <button
