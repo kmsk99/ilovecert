@@ -18,7 +18,10 @@
     "format:check": "prettier --check \"packages/**/*.{ts,tsx,json,md}\"",
     "clean": "kill-port 8545 3000 && rm -rf packages/contracts/cache packages/contracts/artifacts packages/contracts/typechain-types",
     "reset-node": "cd packages/contracts && npx hardhat clean && npx hardhat compile",
-    "start:dev": "pnpm clean && pnpm reset-node && concurrently -n \"node,deploy,frontend\" \"pnpm run node\" \"wait-on -t 30000 tcp:8545 && sleep 5 && pnpm run deploy-contracts\" \"wait-on -t 30000 tcp:8545 && sleep 7 && pnpm run dev\""
+    "start:node": "pnpm clean && pnpm reset-node && pnpm run node",
+    "start:deploy": "wait-on -v -i 2000 -t 60000 http://127.0.0.1:8545 && pnpm run deploy-contracts",
+    "start:frontend": "wait-on -v -i 2000 -t 60000 http://127.0.0.1:8545 && pnpm run dev",
+    "start:dev": "concurrently -n \"node,deploy,frontend\" \"pnpm run start:node\" \"pnpm run start:deploy\" \"pnpm run start:frontend\""
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.21.0",
