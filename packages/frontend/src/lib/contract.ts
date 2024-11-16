@@ -1,4 +1,9 @@
-import { useReadContract, useReadContracts } from 'wagmi';
+import {
+  useReadContract,
+  useReadContracts,
+  usePublicClient,
+  useWaitForTransactionReceipt,
+} from 'wagmi';
 
 import { certificateABI } from '@/config/abi';
 
@@ -52,7 +57,48 @@ export function useCertificate(certificateId: string) {
   };
 }
 
+export function useResetNonce() {
+  const publicClient = usePublicClient({
+    chainId: 8453,
+  });
+
+  const resetNonce = async (address: string) => {
+    try {
+      await publicClient?.prepareTransactionRequest({
+        to: address as `0x${string}`,
+        value: BigInt(0),
+        nonce: 0,
+      });
+    } catch (error) {
+      console.error('Failed to reset nonce:', error);
+    }
+  };
+
+  return resetNonce;
+}
+
+export function useWatchTransaction(transactionHash: `0x${string}`) {
+  const {
+    data: receipt,
+    isLoading,
+    isSuccess,
+  } = useWaitForTransactionReceipt({
+    hash: transactionHash as `0x${string}`,
+    onReplaced: replacement => {
+      console.log('Transaction replaced:', replacement);
+    },
+  });
+
+  return {
+    receipt,
+    isLoading,
+    isSuccess,
+  };
+}
+
 export function useUserCertificates(address?: string) {
+  const resetNonce = useResetNonce();
+
   const {
     data: certificateIds,
     isError: idsError,
