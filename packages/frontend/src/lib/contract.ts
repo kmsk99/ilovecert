@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
   useReadContract,
   useReadContracts,
@@ -25,6 +26,10 @@ export function useCertificate(certificateId: string) {
     abi: certificateABI,
     functionName: 'getCertificate',
     args: [BigInt(certificateId)],
+    query: {
+      gcTime: 0,
+      staleTime: 0,
+    },
   });
 
   if (isError) {
@@ -76,21 +81,28 @@ export function useWatchTransaction(transactionHash: `0x${string}`) {
 }
 
 export function useUserCertificates(address?: string) {
-  const {
-    data: certificateIds,
-    isError: idsError,
-    isLoading: isIdsLoading,
-  } = useReadContract({
+  const { data, isError, refetch } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: certificateABI,
     functionName: 'getUserCertificates',
     args: address ? [address as `0x${string}`] : undefined,
     query: {
       enabled: Boolean(address),
+      retry: 3,
+      retryDelay: 1000,
     },
   });
 
-  const validCertificateIds = certificateIds
+  useEffect(() => {
+    if (isError) {
+      const timer = setTimeout(() => {
+        refetch();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isError, refetch]);
+
+  const validCertificateIds = data
     ?.map(id => {
       try {
         return String(id);
@@ -115,15 +127,15 @@ export function useUserCertificates(address?: string) {
 
   console.log('=== Debug Information ===');
   console.log('Address:', address);
-  console.log('Original Certificate IDs:', certificateIds);
+  console.log('Original Certificate IDs:', data);
   console.log('Valid Certificate IDs:', validCertificateIds);
   console.log('Certificates Results:', certificatesResults.data);
 
-  if (isIdsLoading || certificatesResults.isLoading) {
+  if (isError || certificatesResults.isLoading) {
     return null;
   }
 
-  if (idsError || !validCertificateIds?.length) {
+  if (!validCertificateIds?.length) {
     return [];
   }
 
