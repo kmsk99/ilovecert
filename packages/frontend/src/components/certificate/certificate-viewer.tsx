@@ -21,6 +21,7 @@ interface MetadataType {
   createdAt: string;
 }
 
+// Updated: 2024-11-16 - Modern UI Enhancement
 export function CertificateViewer({ certificateId }: CertificateViewerProps) {
   const certificate = useCertificate(certificateId);
   const [metadata, setMetadata] = useState<MetadataType | null>(null);
@@ -49,10 +50,7 @@ export function CertificateViewer({ certificateId }: CertificateViewerProps) {
   if (!certificate || isMetadataLoading) {
     return (
       <div className='flex flex-col items-center justify-center min-h-[400px] space-y-4'>
-        <div
-          className='w-12 h-12 border-4 border-blue-200 border-t-blue-600 
-                       rounded-full animate-spin'
-        ></div>
+        <div className='w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin'></div>
         <p className='text-gray-500 animate-pulse'>
           인증서 정보를 불러오는 중...
         </p>
@@ -62,10 +60,7 @@ export function CertificateViewer({ certificateId }: CertificateViewerProps) {
 
   if (!metadata) {
     return (
-      <div
-        className='flex flex-col items-center justify-center py-12 px-4 
-                    bg-red-50 rounded-xl text-red-600 space-y-2'
-      >
+      <div className='flex flex-col items-center justify-center py-12 px-4 bg-red-50 rounded-xl text-red-600 space-y-2'>
         <svg
           className='w-12 h-12'
           fill='none'
@@ -112,10 +107,7 @@ export function CertificateViewer({ certificateId }: CertificateViewerProps) {
 
         <div className='pt-6 border-t border-gray-200'>
           <button
-            className='w-full px-6 py-3 bg-blue-600 text-white rounded-xl 
-                      hover:bg-blue-700 transition-all duration-200 
-                      shadow-md hover:shadow-lg transform hover:-translate-y-0.5
-                      flex items-center justify-center gap-2'
+            className='w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2'
             onClick={() => window.print()}
           >
             <svg
@@ -138,15 +130,12 @@ export function CertificateViewer({ certificateId }: CertificateViewerProps) {
 
       <div className='relative'>
         {metadata.image && (
-          <div
-            className='relative aspect-[3/4] rounded-xl overflow-hidden 
-                         shadow-lg border border-gray-200'
-          >
+          <div className='relative aspect-[1/1.414] overflow-hidden shadow-xl border border-gray-200'>
             <Image
               fill
               priority
               alt='Certificate'
-              className='object-contain'
+              className='object-cover'
               src={metadata.image}
             />
           </div>

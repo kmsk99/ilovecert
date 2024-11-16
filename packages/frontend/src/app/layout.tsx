@@ -10,6 +10,7 @@ import { Providers } from '@/components/providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
+// Updated: 2024-11-16 - Modern UI Enhancement
 export default function RootLayout({
   children,
 }: {
@@ -23,14 +24,15 @@ export default function RootLayout({
           content='블록체인 기술을 활용한 안전하고 신뢰할 수 있는 디지털 인증서 발급 플랫폼'
           name='description'
         />
+        <link href='/favicon.ico' rel='icon' />
       </head>
       <body
         suppressHydrationWarning
-        className={`${inter.className} antialiased`}
+        className={`${inter.className} antialiased bg-gradient-to-b from-gray-50 to-white min-h-screen`}
       >
         <Providers>
           <NetworkCheck />
-          {children}
+          <div className='mx-auto max-w-7xl'>{children}</div>
         </Providers>
         <Toaster
           richColors
@@ -40,7 +42,10 @@ export default function RootLayout({
               background: 'white',
               border: '1px solid #E2E8F0',
               borderRadius: '0.75rem',
+              boxShadow:
+                '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
             },
+            className: 'text-sm font-medium',
           }}
         />
       </body>
