@@ -65,7 +65,7 @@ export default function Home() {
         </div>
       ) : (
         <div className='text-center py-20 bg-white rounded-2xl shadow-xl'>
-          <div className='max-w-md mx-auto px-4'>
+          <div className='max-w-md mx-auto px-4 flex flex-col items-center'>
             <div
               className='inline-flex items-center justify-center w-16 h-16 
                           rounded-full bg-blue-100 mb-6'
