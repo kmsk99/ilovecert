@@ -27,30 +27,36 @@ export function ImageUploadField({
   };
 
   return (
-    <div>
+    <div className='space-y-2'>
       <label className='block text-sm font-medium text-gray-700'>{label}</label>
-      <input
-        accept='image/*'
-        className='mt-1 block w-full text-sm text-gray-500
-          file:mr-4 file:py-2 file:px-4
-          file:rounded-md file:border-0
-          file:text-sm file:font-semibold
-          file:bg-indigo-50 file:text-indigo-700
-          hover:file:bg-indigo-100'
-        type='file'
-        onChange={handleFileChange}
-      />
-      {previewSrc && (
-        <div className='mt-2'>
-          <Image
-            alt='Preview'
-            className='h-16 object-contain'
-            height={64}
-            src={previewSrc}
-            width={64}
-          />
-        </div>
-      )}
+      <div className='space-y-4'>
+        <input
+          accept='image/*'
+          className='w-full px-4 py-2.5 rounded-xl border border-gray-200
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-lg file:border-0
+                    file:text-sm file:font-medium
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100
+                    focus:outline-none focus:border-blue-500 focus:ring-2 
+                    focus:ring-blue-200 transition-all duration-200'
+          type='file'
+          onChange={handleFileChange}
+        />
+        {previewSrc && (
+          <div
+            className='relative w-24 h-24 rounded-lg overflow-hidden border 
+                        border-gray-200 shadow-sm'
+          >
+            <Image
+              fill
+              alt='Preview'
+              className='object-contain'
+              src={previewSrc}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

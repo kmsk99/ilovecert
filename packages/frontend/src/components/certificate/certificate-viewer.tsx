@@ -1,7 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
+
+import Image from 'next/image';
 
 import { useCertificate } from '@/hooks/use-certificate';
 import { formatDate } from '@/lib/utils';
@@ -22,7 +23,6 @@ interface MetadataType {
 
 export function CertificateViewer({ certificateId }: CertificateViewerProps) {
   const certificate = useCertificate(certificateId);
-
   const [metadata, setMetadata] = useState<MetadataType | null>(null);
   const [isMetadataLoading, setIsMetadataLoading] = useState(true);
 
@@ -31,7 +31,7 @@ export function CertificateViewer({ certificateId }: CertificateViewerProps) {
       if (!certificate?.metadataURI) return;
 
       try {
-        const response = await fetch(certificate?.metadataURI);
+        const response = await fetch(certificate.metadataURI);
         const data = await response.json();
         setMetadata(data);
       } catch (error) {
@@ -48,59 +48,109 @@ export function CertificateViewer({ certificateId }: CertificateViewerProps) {
 
   if (!certificate || isMetadataLoading) {
     return (
-      <div className='flex justify-center items-center min-h-[400px]'>
-        <div className='animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900'></div>
+      <div className='flex flex-col items-center justify-center min-h-[400px] space-y-4'>
+        <div
+          className='w-12 h-12 border-4 border-blue-200 border-t-blue-600 
+                       rounded-full animate-spin'
+        ></div>
+        <p className='text-gray-500 animate-pulse'>
+          인증서 정보를 불러오는 중...
+        </p>
       </div>
     );
   }
 
   if (!metadata) {
     return (
-      <div className='text-center py-10 bg-red-50 text-red-600 rounded-lg'>
-        인증서를 찾을 수 없거나 로드하는데 실패했습니다.
+      <div
+        className='flex flex-col items-center justify-center py-12 px-4 
+                    bg-red-50 rounded-xl text-red-600 space-y-2'
+      >
+        <svg
+          className='w-12 h-12'
+          fill='none'
+          stroke='currentColor'
+          viewBox='0 0 24 24'
+        >
+          <path
+            d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            strokeWidth={2}
+          />
+        </svg>
+        <h3 className='font-semibold'>인증서를 찾을 수 없습니다</h3>
+        <p className='text-sm'>인증서를 불러오는데 실패했습니다</p>
       </div>
     );
   }
 
   return (
-    <div className='max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg'>
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-        <div className='space-y-6'>
-          <h2 className='text-3xl font-bold mb-6'>{certificate.name}</h2>
+    <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+      <div className='space-y-6'>
+        <div className='space-y-2'>
+          <h2 className='text-3xl font-bold text-gray-900'>
+            {certificate.name}
+          </h2>
+          <p className='text-gray-500'>{metadata.description}</p>
+        </div>
 
-          <div className='space-y-4'>
-            <InfoField label='수령인' value={certificate.recipient} />
-            <InfoField label='발급 기관' value={metadata.organizationName} />
-            <InfoField
-              label='발급자'
-              value={`${metadata.issuerName} ${metadata.issuerTitle}`}
-            />
-            <InfoField
-              label='발급일'
-              value={formatDate(certificate.issuedAt)}
-            />
-            <InfoField label='설명' value={metadata.description} />
-            <InfoField
-              isMonospace
-              label='컨트랙트 주소'
-              value={certificate.issuer}
+        <div className='grid gap-4'>
+          <InfoField label='수령인' value={certificate.recipient} />
+          <InfoField label='발급 기관' value={metadata.organizationName} />
+          <InfoField
+            label='발급자'
+            value={`${metadata.issuerName} ${metadata.issuerTitle}`}
+          />
+          <InfoField label='발급일' value={formatDate(certificate.issuedAt)} />
+          <InfoField
+            isMonospace
+            label='컨트랙트 주소'
+            value={certificate.issuer}
+          />
+        </div>
+
+        <div className='pt-6 border-t border-gray-200'>
+          <button
+            className='w-full px-6 py-3 bg-blue-600 text-white rounded-xl 
+                      hover:bg-blue-700 transition-all duration-200 
+                      shadow-md hover:shadow-lg transform hover:-translate-y-0.5
+                      flex items-center justify-center gap-2'
+            onClick={() => window.print()}
+          >
+            <svg
+              className='w-5 h-5'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+              />
+            </svg>
+            인증서 다운로드
+          </button>
+        </div>
+      </div>
+
+      <div className='relative'>
+        {metadata.image && (
+          <div
+            className='relative aspect-[3/4] rounded-xl overflow-hidden 
+                         shadow-lg border border-gray-200'
+          >
+            <Image
+              fill
+              priority
+              alt='Certificate'
+              className='object-contain'
+              src={metadata.image}
             />
           </div>
-        </div>
-
-        <div className='relative'>
-          {metadata.image && (
-            <div className='relative w-full aspect-[3/4] rounded-lg overflow-hidden shadow-lg'>
-              <Image
-                fill
-                priority
-                alt='Certificate'
-                className='object-contain'
-                src={metadata.image}
-              />
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
@@ -114,10 +164,10 @@ interface InfoFieldProps {
 
 function InfoField({ label, value, isMonospace }: InfoFieldProps) {
   return (
-    <div className='space-y-1'>
+    <div className='bg-gray-50 rounded-lg p-4 space-y-1'>
       <label className='text-sm font-medium text-gray-500'>{label}</label>
       <p
-        className={`${isMonospace ? 'font-mono text-sm' : 'text-lg'} break-all`}
+        className={`${isMonospace ? 'font-mono text-sm' : 'text-lg'} text-gray-900 break-all`}
       >
         {value}
       </p>
