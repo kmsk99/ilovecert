@@ -122,6 +122,8 @@ export function useUserCertificates(address?: string) {
       })) ?? [],
     query: {
       enabled: Boolean(validCertificateIds?.length),
+      retry: 3,
+      retryDelay: 1000,
     },
   });
 
@@ -139,37 +141,53 @@ export function useUserCertificates(address?: string) {
     return [];
   }
 
-  if (!certificatesResults.data?.length) {
-    return [];
-  }
-
   try {
-    const processedCertificates = certificatesResults.data
-      .filter(result => result.status === 'success' && result.result)
+    const processedCertificates = (certificatesResults.data ?? [])
+      .filter(result => {
+        return (
+          result.status === 'success' &&
+          result.result &&
+          Array.isArray(result.result) &&
+          result.result.length >= 7
+        );
+      })
       .map(({ result }) => {
         if (!result) return null;
 
-        const [id, issuer, recipientName, metadataURI, issuedAt, isValid] =
-          result as unknown as [
+        try {
+          const [
+            id,
+            issuer,
+            recipientName,
+            metadataURI,
+            issuedAt,
+            isValid,
+            certificateType,
+          ] = result as unknown as [
             bigint,
             `0x${string}`,
             string,
             string,
             bigint,
             boolean,
+            string,
           ];
 
-        const ipfsHash = metadataURI.replace('ipfs://', '');
+          const ipfsHash = metadataURI.replace('ipfs://', '');
 
-        return {
-          id: String(id),
-          name: '인증서',
-          description: '',
-          recipient: recipientName,
-          issuer,
-          issuedAt: Number(issuedAt) * 1000,
-          imageUrl: `${process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL}/${ipfsHash}`,
-        };
+          return {
+            id: String(id),
+            name: certificateType,
+            description: '',
+            recipient: recipientName,
+            issuer,
+            issuedAt: Number(issuedAt) * 1000,
+            imageUrl: `${process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL}/${ipfsHash}`,
+          };
+        } catch (error) {
+          console.error('Certificate processing error:', error);
+          return null;
+        }
       })
       .filter((cert): cert is NonNullable<typeof cert> => cert !== null);
 

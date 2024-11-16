@@ -107,12 +107,12 @@ export function useCertificateContract() {
     // IPFS 업로드 로직
     const metadataUri = await uploadCertificateData(formData, previewElement);
 
-    // 컨트랙트 호출
+    // 컨트랙트 호출 - certificateType 인자 추가
     await writeContract({
       address: CONTRACT_ADDRESS,
       abi: certificateABI,
       functionName: 'issueCertificate',
-      args: [formData.recipientName, metadataUri],
+      args: [formData.recipientName, metadataUri, formData.certificateType], // certificateType 추가
     });
   };
 

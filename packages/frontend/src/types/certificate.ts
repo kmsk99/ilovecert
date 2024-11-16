@@ -8,15 +8,15 @@ export interface Certificate {
   imageUrl?: string;
 }
 
-export interface CertificateFormData {
+export type CertificateFormData = {
   recipientName: string;
   certificateType: string;
   description: string;
   issuerName: string;
   issuerTitle: string;
-  issuedAt: string;
   organizationName: string;
   bgColor: string;
   borderColor: string;
   logoBase64: string;
-}
+  issuedAt: string;
+};

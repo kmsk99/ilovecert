@@ -9,6 +9,7 @@ contract CertificateContract {
         string metadataURI;
         uint256 issuedAt;
         bool isValid;
+        string certificateType;
     }
 
     mapping(uint256 => Certificate) public certificates;
@@ -53,10 +54,12 @@ contract CertificateContract {
 
     function issueCertificate(
         string memory recipientName,
-        string memory metadataURI
+        string memory metadataURI,
+        string memory certificateType
     ) external onlyIssuer returns (uint256) {
         require(bytes(recipientName).length > 0, "Recipient name cannot be empty");
         require(bytes(metadataURI).length > 0, "Metadata URI cannot be empty");
+        require(bytes(certificateType).length > 0, "Certificate type cannot be empty");
 
         _certificateCounter++;
         
@@ -66,7 +69,8 @@ contract CertificateContract {
             recipientName: recipientName,
             metadataURI: metadataURI,
             issuedAt: block.timestamp,
-            isValid: true
+            isValid: true,
+            certificateType: certificateType
         });
 
         userCertificates[msg.sender].push(_certificateCounter);
@@ -117,7 +121,8 @@ contract CertificateContract {
         string memory recipientName,
         string memory metadataURI,
         uint256 issuedAt,
-        bool isValid
+        bool isValid,
+        string memory certificateType
     ) {
         Certificate memory cert = certificates[certificateId];
         return (
@@ -126,7 +131,8 @@ contract CertificateContract {
             cert.recipientName,
             cert.metadataURI,
             cert.issuedAt,
-            cert.isValid
+            cert.isValid,
+            cert.certificateType
         );
     }
 } 

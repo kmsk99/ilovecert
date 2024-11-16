@@ -223,6 +223,11 @@ export const certificateABI = [
         name: 'metadataURI',
         type: 'string',
       },
+      {
+        internalType: 'string',
+        name: 'certificateType',
+        type: 'string',
+      },
     ],
     name: 'issueCertificate',
     outputs: [
