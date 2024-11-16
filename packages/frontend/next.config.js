@@ -2,6 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@react-pdf/renderer'],
+  images: {
+    domains: ['teal-worthwhile-condor-704.mypinata.cloud'],
+  },
   webpack: config => {
     config.resolve.alias.canvas = false;
     config.resolve.alias.encoding = false;

@@ -20,3 +20,13 @@ export type CertificateFormData = {
   logoBase64: string;
   issuedAt: string;
 };
+
+export type ContractCertificate = {
+  id: bigint;
+  issuer: `0x${string}`;
+  recipientName: string;
+  metadataURI: string;
+  issuedAt: bigint;
+  isValid: boolean;
+  certificateType: string;
+};
